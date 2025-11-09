@@ -192,7 +192,7 @@ ALL_FEATURES = SEARCH_PAGE_FEATURES + [f for f in LISTING_PAGE_FEATURES if f not
 
 NOMINATIM_CONFIG = {
     'base_url': 'https://nominatim.openstreetmap.org',
-    'email': 'your_email@example.com',  # Required by Nominatim usage policy
+    'email': 'lorenzo.zorzi@gmail.com',  # Required by Nominatim usage policy
     'user_agent': 'LondonPropertyPricePrediction/2.0',
     'rate_limit': 1.0,  # Max 1 request per second (Nominatim policy)
     'timeout': 10,  # Request timeout in seconds
