@@ -240,6 +240,20 @@ class EnhancedSeleniumScraper:
             listings = self._extract_listings_from_soup(soup)
             logger.info(f"✅ Extracted {len(listings)} listings from page {page_num}")
 
+            # DEBUG: Show sample of what was extracted
+            if listings and len(listings) > 0:
+                sample = listings[0]
+                has_data = any(v is not None for v in sample.values())
+                if not has_data:
+                    logger.warning("⚠️ WARNING: Listings found but all values are None!")
+                    logger.warning("💡 Saving debug HTML to inspect the page structure...")
+                    with open(f'debug_extraction_{postcode_area}_p{page_num}.html', 'w', encoding='utf-8') as f:
+                        f.write(self.driver.page_source)
+                    logger.info(f"💾 Debug HTML saved to: debug_extraction_{postcode_area}_p{page_num}.html")
+                    logger.info("📋 Please open this file and check the actual HTML structure")
+                else:
+                    logger.info(f"📝 Sample extracted: address={sample.get('address', 'N/A')[:50]}...")
+
             return listings
 
         except Exception as e:
@@ -264,6 +278,12 @@ class EnhancedSeleniumScraper:
             listing_divs = soup.find_all('div', attrs={'data-testid': re.compile(r'listing')})
 
         logger.info(f"📦 Found {len(listing_divs)} potential listing divs")
+
+        # DEBUG: Show what test IDs are actually in the first listing
+        if listing_divs and len(listing_divs) > 0:
+            first_div = listing_divs[0]
+            testids = [elem.get('data-testid') for elem in first_div.find_all(attrs={'data-testid': True})]
+            logger.info(f"🔍 First listing contains these data-testid values: {testids[:10]}")
 
         for listing_div in listing_divs:
             try:
