@@ -24,9 +24,13 @@ print("\n" + "="*80 + "\n")
 
 # Test with NON-HEADLESS mode first for debugging
 print("🪟 Running in NON-HEADLESS mode (you'll see the browser)")
-print("   This helps diagnose if Zoopla is blocking headless Chrome\n")
+print("   This allows you to solve Cloudflare challenges manually\n")
+print("⚠️  If Cloudflare appears:")
+print("   - The script will PAUSE and wait for you")
+print("   - Solve the challenge in the browser window")
+print("   - Press ENTER in the terminal to continue\n")
 
-scraper = EnhancedSeleniumScraper(headless=False)  # Changed to False for visibility
+scraper = EnhancedSeleniumScraper(headless=False)  # Must be False to solve Cloudflare
 
 try:
     # Test scrape W1 - just 1 page

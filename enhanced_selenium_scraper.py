@@ -108,6 +108,48 @@ class EnhancedSeleniumScraper:
         except Exception as e:
             logger.debug(f"Cookie banner handling: {e}")
 
+    def _handle_cloudflare_if_present(self):
+        """Detect Cloudflare challenge and wait for manual solving"""
+        try:
+            page_source = self.driver.page_source.lower()
+            page_title = self.driver.title.lower()
+
+            # Check for Cloudflare indicators
+            cloudflare_detected = (
+                'cloudflare' in page_source or
+                'cf-browser-verification' in page_source or
+                'just a moment' in page_title or
+                'challenge-platform' in page_source or
+                'checking your browser' in page_source
+            )
+
+            if cloudflare_detected:
+                logger.warning("⚠️  🛡️  CLOUDFLARE CHALLENGE DETECTED!")
+                logger.info("=" * 80)
+                logger.info("⏸️  PAUSED - Please solve the Cloudflare challenge manually")
+                logger.info("=" * 80)
+                logger.info("👉 Steps:")
+                logger.info("   1. Look at the browser window")
+                logger.info("   2. Click the Cloudflare checkbox/button")
+                logger.info("   3. Wait for it to complete")
+                logger.info("   4. Press ENTER here when done")
+                logger.info("=" * 80)
+
+                if not self.headless:
+                    # In non-headless mode, wait for user input
+                    input("\n⏳ Press ENTER after solving the Cloudflare challenge...")
+                else:
+                    # In headless mode, just wait longer
+                    logger.warning("⚠️  Running in headless mode - waiting 30 seconds...")
+                    logger.info("💡 TIP: Run with headless=False to solve challenges manually")
+                    time.sleep(30)
+
+                logger.info("✅ Continuing scraping...")
+                time.sleep(2)  # Extra buffer
+
+        except Exception as e:
+            logger.debug(f"Cloudflare check error: {e}")
+
     def _random_delay(self):
         """Human-like delay between actions"""
         delay = random.uniform(REQUEST_DELAY_MIN, REQUEST_DELAY_MAX)
@@ -136,6 +178,9 @@ class EnhancedSeleniumScraper:
             # Accept cookies on first page
             if page_num == 1:
                 self._accept_cookies()
+
+            # Check for Cloudflare challenge and wait for manual solving
+            self._handle_cloudflare_if_present()
 
             # Scroll page to trigger lazy loading
             logger.info("📜 Scrolling page to load all content...")
